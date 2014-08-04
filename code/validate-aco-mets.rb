@@ -84,7 +84,8 @@ class FileElementBase
     if @path
       validator = get_checksum_validator
       calculated_checksum = validator.file(@path).hexdigest
-      @errors << "fixity check failed: expected #{@checksum} got #{calculated_checksum}" unless @checksum == calculated_checksum
+      file = @path
+      @errors << "fixity check failed: expected #{@checksum} got #{calculated_checksum} #{file}" unless @checksum == calculated_checksum
     else
       @errors << "could not calculate checksum due to missing invalid path"
     end
@@ -242,8 +243,8 @@ class ACOMETSValidator
             expected_cnt    = 1 # zeutschel should have one calibration image
         elsif eoc_hash == '5abf7e6b119ae26ff54060de9259534ae7e5f1412399350377f1ee23e4a478da7a5224a5d47e47f8af5530602fbc8c0d7d48cdb8f5e4e81fde11443ee3c63a58'
             expected_cnt    = 2 # bc100 should have two calibration images
-	    end
-	end
+        end
+  end    	
     calibration_cnt = 0
     @doc.search('digiprovMD').each do |d|
       if d.search('mdRef')[0]['OTHERMDTYPE'] == 'CALIBRATION-TARGET-IMAGE'
@@ -321,9 +322,12 @@ end
 #puts "validating #{mets_file_path}"
 
 dir_cnt = 0
-Dir['*/data'].each do |a|
 
+Dir['*/'].each do |a|
+	
 	Dir.chdir(a) do
+	
+		puts "checking #{a}"
 	
 		mets_file_path = Dir.glob('*_mets.xml')[0] #ARGV[0]
 		
